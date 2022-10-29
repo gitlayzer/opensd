@@ -109,7 +109,7 @@ nova_novncproxy_base_url: "http://{{ external_fqdn if external_fqdn is defined a
 nova_novncproxy_vncserver_proxyclient_address: "{{ api_interface_address }}"
 nova_novncproxy_vncserver_listen: "{{ api_interface_address }}"
 nova_novncproxy_agent_enabled: True
-vnc_auth_schemes: "none,vnc"
+vnc_auth_schemes: "none,vencrypt"
 
 ## Nova metadata
 nova_metadata_port: 8775
@@ -120,20 +120,20 @@ nova_enable_instance_password: True
 nova_force_config_drive: True
 
 ## Nova placement
-nova_placement_service_enabled: True
-nova_placement_service_user_domain_id: Default
-nova_placement_service_project_domain_id: Default
-nova_placement_service_interface: internal
-nova_placement_service_username: placement
-nova_placement_service_name: placement
-nova_placement_service_role_name: "{{ nova_service_role_name }}"
-nova_placement_service_type: placement
-nova_placement_service_project_name: "{{ nova_service_project_name }}"
-nova_placement_service_region: "{{ nova_service_region }}"
-nova_placement_service_description: "Openstack Placement Service"
-nova_placement_service_publicurl: "http://{{ opensd_vip_address }}:{{ placement_api_port }}"
-nova_placement_service_internalurl: "http://{{ opensd_vip_address }}:{{ placement_api_port }}"
-nova_placement_service_adminurl: "http://{{ opensd_vip_address }}:{{ placement_api_port }}"
+placement_service_enabled: True
+placement_service_user_domain_id: Default
+placement_service_project_domain_id: Default
+placement_service_interface: internal
+placement_service_username: placement
+placement_service_name: placement
+placement_service_role_name: "{{ nova_service_role_name }}"
+placement_service_type: placement
+placement_service_project_name: "{{ nova_service_project_name }}"
+placement_service_region: "{{ nova_service_region }}"
+placement_service_description: "Openstack Placement Service"
+placement_service_publicurl: "http://{{ opensd_vip_address }}:{{ placement_api_port }}"
+placement_service_internalurl: "http://{{ opensd_vip_address }}:{{ placement_api_port }}"
+placement_service_adminurl: "http://{{ opensd_vip_address }}:{{ placement_api_port }}"
 
 ## Nova libvirt
 libvirt_service_name: libvirtd
@@ -205,14 +205,8 @@ nova_scheduler_driver_task_period: 60
 nova_scheduler_host_subset_size: 10
 nova_scheduler_max_attempts: 5
 nova_scheduler_default_filters: >-
-  RetryFilter,
   AvailabilityZoneFilter,
-  RamFilter,
-  AggregateRamFilter,
   ComputeFilter,
-  AggregateCoreFilter,
-  DiskFilter,
-  AggregateDiskFilter,
   AggregateNumInstancesFilter,
   AggregateIoOpsFilter,
   ComputeCapabilitiesFilter,
@@ -222,7 +216,6 @@ nova_scheduler_default_filters: >-
   NUMATopologyFilter,
   PciPassthroughFilter,
   AggregateMultiTenancyIsolation,
-  DedicatedHostFilter,
   AggregateInstanceExtraSpecsFilter
 nova_scheduler_driver: filter_scheduler
 nova_scheduler_available_filters: nova.scheduler.filters.all_filters
@@ -302,7 +295,7 @@ nova_common_packages:
   - python-nova
   - openstack-nova-novncproxy
   - openstack-nova-common
-  - python2-PyMySQL
+  - python3-PyMySQL
   - python-memcached
 nova_compute_packages_x86_64:
   - openstack-nova-compute
@@ -318,6 +311,7 @@ nova_compute_packages_aarch64:
   - dosfstools
   - iscsi-initiator-utils
   - kpartx
+  - edk2-aarch64 
 nova_conductor_packages:
   - openstack-nova-conductor
 nova_compute_ironic_packages:
@@ -345,22 +339,15 @@ nova_package_state: "present"
 # Libvirt package info
 libvirt_common_packages:
   - nc
-  - libvirt-python
+  - python-libvirt
   - nfs-utils
   - python-libguestfs
   - sysfsutils
+  - dmidecode
 libvirt_packages_x86_64:
-  - libvirt-daemon-kvm
-  - libvirt-daemon-driver-qemu
-  - libvirt-client
-  - qemu-kvm-ev
-  - qemu-img-ev
+  - libvirt
 libvirt_packages_aarch64:
   - libvirt
-  - qemu-kvm-ma
-  - qemu-kvm-common-ma
-  - qemu-kvm-tools-ma
-  - qemu-img-ma
 libvirt_package_list: |-
   {% set packages = libvirt_common_packages %}
   {% if nova_services['nova-compute']['group'] in group_names or nova_services['ironic-nova-compute']['group'] in group_names %}

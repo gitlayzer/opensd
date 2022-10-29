@@ -33,7 +33,6 @@
   become: true
   with_items:
     - glance-api
-    - glance-registry
   notify:
     - Restart glance services
 
@@ -47,18 +46,5 @@
   with_first_found:
     - "{{ node_custom_config }}/glance/glance-api-paste.ini"
     - "glance-api-paste.ini.j2"
-  notify:
-    - Restart glance services
-
-- name: Copying over glance registry paste file
-  template:
-    src: "{{ item }}"
-    dest: "/etc/glance/glance-registry-paste.ini"
-    owner: root
-    group: "{{ glance_system_user_name }}"
-    mode: "0660"
-  with_first_found:
-    - "{{ node_custom_config }}/glance/glance-registry-paste.ini"
-    - "glance-registry-paste.ini.j2"
   notify:
     - Restart glance services
