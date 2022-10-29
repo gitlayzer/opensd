@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+
+[placement_database]
+connection = mysql+pymysql://{{ placement_database_user }}:{{ placement_database_password }}@{{ database_address }}/{{ placement_database_name }}
+
+[api]
+auth_strategy = keystone
+
+[keystone_authtoken]
+auth_type = {{ placement_keystone_auth_plugin }}
+auth_url = {{ keystone_auth_url }}
+project_domain_id = {{ placement_service_project_domain_id }}
+user_domain_id = {{ placement_service_user_domain_id }}
+project_name = {{ placement_service_project_name }}
+username = {{ placement_service_user_name }}
+password = {{ placement_service_password }}
+memcached_servers = {% for host in groups['memcached'] %}{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
